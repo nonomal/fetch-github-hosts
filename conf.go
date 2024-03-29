@@ -5,11 +5,13 @@ import (
 )
 
 type FetchConf struct {
+	Lang   string
 	Client struct {
 		Interval     int
 		Method       string
 		SelectOrigin string
 		CustomUrl    string
+		AutoFetch    bool
 	}
 	Server struct {
 		Interval int
@@ -18,10 +20,12 @@ type FetchConf struct {
 }
 
 func (f *FetchConf) Storage() {
+	viper.Set("lang", f.Lang)
 	viper.Set("client.interval", f.Client.Interval)
 	viper.Set("client.method", f.Client.Method)
 	viper.Set("client.selectorigin", f.Client.SelectOrigin)
 	viper.Set("client.customurl", f.Client.CustomUrl)
+	viper.Set("client.autofetch", f.Client.AutoFetch)
 	viper.Set("server.interval", f.Server.Interval)
 	viper.Set("server.port", f.Server.Port)
 	if err := viper.WriteConfigAs("conf.yaml"); err != nil {
@@ -33,9 +37,11 @@ func LoadFetchConf() *FetchConf {
 	viper.AddConfigPath(AppExecDir())
 	viper.SetConfigName("conf")
 	viper.SetConfigType("yaml")
+	viper.SetDefault("lang", "zh-CN")
 	viper.SetDefault("client.interval", 60)
 	viper.SetDefault("client.method", "官方指定hosts源")
 	viper.SetDefault("client.selectorigin", "FetchGithubHosts")
+	viper.SetDefault("client.autofetch", false)
 	viper.SetDefault("server.interval", 60)
 	viper.SetDefault("server.port", 9898)
 	var fileNotExits bool
